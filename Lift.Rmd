@@ -1,0 +1,99 @@
+---
+title: "Dumbbell Bicep Curl"
+author: "Massimiliano Grassi"
+date: "19 maggio 2015"
+output:
+  html_document:
+    keep_md: yes
+---
+
+#Pratical Machine Learning. Course Project: Writeup
+
+The data for this project come from [this source](http://groupware.les.inf.puc-rio.br/har).
+
+The datasets contain data from accelerometers worn by people that perfored several Dumbbell Bicep Curl exercises in five different ways: one (A) following the correct technique and four (B-E) with incorrect techniques. The training dataset contains data from `r nrow(training)` observations with the correct classification in the factor variable 'classe'. The testing set contains 20 observation not included in the training dataset that the built algorhitm will have to predict (the correct classification is not provided in the test dataset). 
+
+```{r, warning=FALSE, message=FALSE, cache=TRUE}
+dir.create("./data")
+download.file("http://d396qusza40orc.cloudfront.net/predmachlearn/pml-training.csv", destfile = "./data/training.csv")
+
+download.file("http://d396qusza40orc.cloudfront.net/predmachlearn/pml-testing.csv", destfile="./data/testing.csv")
+
+training<-read.csv("./data/training.csv")
+testing<-read.csv("./data/testing.csv")
+```
+
+##Model Training
+
+The original training data set was split in a train (80%) and a validation (20%) dataset, in order to use the latter to have an unbiased estimate of the out-of-sample classification performance.
+
+```{r, cache=TRUE, message=FALSE}
+library('caret')
+
+train_validation_split  <- createDataPartition(training$classe, p=0.8, list = FALSE)
+train  <- training[train_validation_split,]
+validation  <- training[-train_validation_split,]
+```
+
+Variable not of interest were removed from the train dataset, e.g. those regarding subjects name and time-stamps or those including mostly missing values. A summary of the removed variables is reported in Appendix 1.
+
+```{r, cache=TRUE}
+train_cleaned<-train[,-c(1:7,12:36,50:59,69:83,87:101,103:112,125:139,141:150)]
+```
+
+All the remaining variables will be employed as cadidate predictors in the process of model building and training. They are all numeric, as indentified by a variable inspection (see Appendix 2). 
+
+Random Forest was chosen as algorithm to build the predicitive model. Training was performed with the train function in the caret package. A k-fold cross-validation strategy (k=20) was be applied during the training in order to choose the combination of tuning parameters that provides the best performance. After that the best tuning parameters combination was identified, the final model was trained with this combination applying the entire train sample.
+
+```{r, cache=TRUE}
+cross_validation  <- trainControl(method = 'cv', number = 20)
+
+Model_Random_Forest  <- train(classe ~., method = 'rf', data=train_cleaned, trControl = cross_validation)
+
+print(Model_Random_Forest)
+```
+
+#Model Testing
+
+To have an estemation of the out-of-sample classification performance, the fitted model was applied to the validation dataset.
+
+```{r, cache=TRUE}
+Result_Validation  <- predict(Model_Random_Forest, validation)
+confusionmatrixValidation  <- confusionMatrix(Result_Validation, validation$classe)
+```
+
+The estimated out-of-sample classification accuracy is `r confusionmatrixValidation[[3]][1]*100`% and kappa is `r confusionmatrixValidation[[3]][2]`, while the estimated classification error is `r (1-confusionmatrixValidation[[3]][1])*100`%, as calculated in the validation sample not used to build the madel. 
+
+##Prediction performed with testing dataset
+
+Finally, the model was applied to the testing set and predictions were saved as individual text-files as required for the sumbission to the Coursera web-site.
+
+
+```{r, warning=FALSE, cache=TRUE}
+Result_Testing  <- as.character(predict(Model_Random_Forest, testing))
+
+pml_write_files = function(x){
+  n = length(x)
+  for(i in 1:n){
+    filename = paste0("problem_id_",i,".txt")
+    write.table(x[i],file=filename,quote=FALSE,row.names=FALSE,col.names=FALSE)
+  }
+}
+
+dir.create("./testing_results")
+setwd("./testing_results")
+
+pml_write_files(Result_Testing)
+```
+
+##Appendix 
+##1.
+```{r, cache=TRUE}
+summary(train[,c(1:7,12:36,50:59,69:83,87:101,103:112,125:139,141:150)])
+```
+
+##2.
+```{r, cache=TRUE}
+summary(train_cleaned)
+```
+
