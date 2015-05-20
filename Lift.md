@@ -1,4 +1,3 @@
-# Dumbbell Bicep Curl
 Massimiliano Grassi  
 19 maggio 2015  
 
@@ -91,9 +90,44 @@ To have an estemation of the out-of-sample classification performance, the fitte
 ```r
 Result_Validation  <- predict(Model_Random_Forest, validation)
 confusionmatrixValidation  <- confusionMatrix(Result_Validation, validation$classe)
+print(confusionmatrixValidation)
 ```
 
-The estimated out-of-sample classification accuracy is 99.4646954% and kappa is 0.9932287, while the estimated classification error is 0.5353046%, as calculated in the validation sample not used to build the madel. 
+```
+## Confusion Matrix and Statistics
+## 
+##           Reference
+## Prediction    A    B    C    D    E
+##          A 1116    0    0    0    0
+##          B    0  758    0    0    0
+##          C    0    1  684    3    1
+##          D    0    0    0  640    0
+##          E    0    0    0    0  720
+## 
+## Overall Statistics
+##                                          
+##                Accuracy : 0.9987         
+##                  95% CI : (0.997, 0.9996)
+##     No Information Rate : 0.2845         
+##     P-Value [Acc > NIR] : < 2.2e-16      
+##                                          
+##                   Kappa : 0.9984         
+##  Mcnemar's Test P-Value : NA             
+## 
+## Statistics by Class:
+## 
+##                      Class: A Class: B Class: C Class: D Class: E
+## Sensitivity            1.0000   0.9987   1.0000   0.9953   0.9986
+## Specificity            1.0000   1.0000   0.9985   1.0000   1.0000
+## Pos Pred Value         1.0000   1.0000   0.9927   1.0000   1.0000
+## Neg Pred Value         1.0000   0.9997   1.0000   0.9991   0.9997
+## Prevalence             0.2845   0.1935   0.1744   0.1639   0.1838
+## Detection Rate         0.2845   0.1932   0.1744   0.1631   0.1835
+## Detection Prevalence   0.2845   0.1932   0.1756   0.1631   0.1835
+## Balanced Accuracy      1.0000   0.9993   0.9992   0.9977   0.9993
+```
+
+The estimated out-of-sample classification accuracy is 99.8725465% and kappa is 0.9983879, while the estimated classification error is 0.1274535%, as calculated in the validation sample not used to build the madel. 
 
 ##Prediction performed with testing dataset
 

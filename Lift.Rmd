@@ -1,5 +1,5 @@
 ---
-title: "Dumbbell Bicep Curl"
+
 author: "Massimiliano Grassi"
 date: "19 maggio 2015"
 output:
@@ -60,6 +60,7 @@ To have an estemation of the out-of-sample classification performance, the fitte
 ```{r, cache=TRUE}
 Result_Validation  <- predict(Model_Random_Forest, validation)
 confusionmatrixValidation  <- confusionMatrix(Result_Validation, validation$classe)
+print(confusionmatrixValidation)
 ```
 
 The estimated out-of-sample classification accuracy is `r confusionmatrixValidation[[3]][1]*100`% and kappa is `r confusionmatrixValidation[[3]][2]`, while the estimated classification error is `r (1-confusionmatrixValidation[[3]][1])*100`%, as calculated in the validation sample not used to build the madel. 
