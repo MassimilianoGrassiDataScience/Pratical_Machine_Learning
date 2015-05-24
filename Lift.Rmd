@@ -1,13 +1,10 @@
 ---
-
+title: "Pratical Machine Learning. Course Project: Writeup"
 author: "Massimiliano Grassi"
-date: "19 maggio 2015"
 output:
   html_document:
     keep_md: yes
 ---
-
-#Pratical Machine Learning. Course Project: Writeup
 
 The data for this project come from [this source](http://groupware.les.inf.puc-rio.br/har).
 
@@ -45,11 +42,13 @@ All the remaining variables will be employed as cadidate predictors in the proce
 
 Random Forest was chosen as algorithm to build the predicitive model. Training was performed with the train function in the caret package. A k-fold cross-validation strategy (k=20) was be applied during the training in order to choose the combination of tuning parameters that provides the best performance. After that the best tuning parameters combination was identified, the final model was trained with this combination applying the entire train sample.
 
-```{r, cache=TRUE}
+```{r, cache=TRUE, results='hide',message=FALSE}
 cross_validation  <- trainControl(method = 'cv', number = 20)
 
 Model_Random_Forest  <- train(classe ~., method = 'rf', data=train_cleaned, trControl = cross_validation)
+```
 
+```{r, cache=TRUE}
 print(Model_Random_Forest)
 ```
 
